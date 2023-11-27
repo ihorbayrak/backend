@@ -4,12 +4,19 @@ namespace App\Modules\V1\User\Repositories;
 
 use App\Models\User;
 use App\Modules\V1\User\DTO\UpdateUserFields;
+use App\Modules\V1\User\Exceptions\UserNotFoundException;
 
 class UserRepository implements UserRepositoryInterface
 {
     public function findById($userId)
     {
-        return User::find($userId);
+        $user = User::find($userId);
+
+        if (!$user) {
+            throw new UserNotFoundException();
+        }
+
+        return $user;
     }
 
     public function findByEmail($email)
