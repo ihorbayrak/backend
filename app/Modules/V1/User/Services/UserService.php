@@ -4,12 +4,12 @@ namespace App\Modules\V1\User\Services;
 
 use App\Modules\V1\User\DTO\ChangePassword;
 use App\Modules\V1\User\DTO\UpdateUserFields;
-use App\Modules\V1\User\Repositories\UserRepository;
+use App\Modules\V1\User\Repositories\UserRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
-    public function __construct(private UserRepository $userRepository)
+    public function __construct(private UserRepositoryInterface $userRepository)
     {
     }
 
