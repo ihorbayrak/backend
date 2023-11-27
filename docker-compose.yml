@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+
+    #PHP Service
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: app
+        restart: unless-stopped
+        working_dir: /var/www
+        tty: true
+        volumes:
+            - ./:/var/www
+            - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+
+    #Nginx Service
+    webserver:
+        image: nginx:1.25.3
+        container_name: webserver
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "8000:80"
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+
+    #MySQL Service
+    db:
+        image: mysql:8.2.0
+        container_name: db
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+        volumes:
+            - ./storage/mysql:/var/lib/mysql
+
+    #Redis Service
+    redis:
+        image: redis:7.2.3
+        container_name: app-redis
+        volumes:
+            - ./storage/redis:/data
