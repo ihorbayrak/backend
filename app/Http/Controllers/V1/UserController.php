@@ -7,6 +7,7 @@ use App\Modules\V1\User\DTO\ChangePassword;
 use App\Modules\V1\User\DTO\UpdateUserFields;
 use App\Modules\V1\User\Requests\ChangeUserPasswordRequest;
 use App\Modules\V1\User\Requests\UpdateUserRequest;
+use App\Modules\V1\User\Resources\UserResource;
 use App\Modules\V1\User\Services\UserService;
 use Illuminate\Http\Request;
 
@@ -14,6 +15,11 @@ class UserController extends Controller
 {
     public function __construct(private UserService $userService)
     {
+    }
+
+    public function show(Request $request)
+    {
+        return new UserResource($request->user());
     }
 
     public function update(UpdateUserRequest $request)
