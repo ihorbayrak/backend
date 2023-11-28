@@ -28,7 +28,8 @@ class ProfileController extends Controller
     {
         $dto = new UpdateProfileFields(
             username: $request->get('username'),
-            bio: $request->get('bio')
+            bio: $request->get('bio'),
+            avatar: $request->get('avatar')
         );
 
         $profile = $this->profileService->update($username, $dto);
