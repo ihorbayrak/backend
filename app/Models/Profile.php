@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * App\Models\Profile
@@ -54,6 +56,8 @@ class Profile extends Model
     use HasFactory, SoftDeletes;
 
     const MAX_BIO_CHARS = 180;
+    const AVATAR_WIDTH = 180;
+    const AVATAR_HEIGHT = 180;
 
     protected $fillable = [
         'user_id',
@@ -61,6 +65,15 @@ class Profile extends Model
         'bio',
         'avatar',
     ];
+
+    protected function avatar(): Attribute
+    {
+        return Attribute::make(
+            get: fn(?string $path) => $path ? Storage::url($path) : Storage::url(
+                config('aws-s3-folders.profiles.placeholders')
+            ),
+        );
+    }
 
     public function user()
     {
