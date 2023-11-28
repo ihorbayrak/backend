@@ -3,6 +3,7 @@
 namespace App\Modules\V1\User\Services;
 
 use App\Models\User;
+use App\Modules\V1\User\Actions\SendNewFollowerNotificationAction;
 use App\Modules\V1\User\DTO\UpdateProfileFields;
 use App\Modules\V1\User\Exceptions\ProfileAlreadyFollowingException;
 use App\Modules\V1\User\Exceptions\ProfileFollowsHimselfException;
@@ -10,8 +11,11 @@ use App\Modules\V1\User\Repositories\ProfileRepositoryInterface;
 
 class ProfileService
 {
-    public function __construct(private ProfileRepositoryInterface $profileRepository, private UserService $userService)
-    {
+    public function __construct(
+        private ProfileRepositoryInterface $profileRepository,
+        private UserService $userService,
+        private SendNewFollowerNotificationAction $newFollowerNotification,
+    ) {
     }
 
     public function update($username, UpdateProfileFields $dto)
@@ -33,6 +37,8 @@ class ProfileService
         }
 
         $owner->follows()->attach($profileToFollow->id);
+
+        $this->newFollowerNotification->handle($profileToFollow, $owner);
 
         return $profileToFollow;
     }
