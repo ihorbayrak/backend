@@ -2,6 +2,7 @@
 
 namespace App\Modules\V1\User\Repositories;
 
+use App\Modules\V1\Auth\DTO\RegisterCredentials;
 use App\Modules\V1\User\DTO\UpdateUserFields;
 
 interface UserRepositoryInterface
@@ -13,6 +14,8 @@ interface UserRepositoryInterface
     public function findByEmailToken($emailToken);
 
     public function update(UpdateUserFields $data);
+
+    public function create(RegisterCredentials $data);
 
     public function deactivate($userId);
 
