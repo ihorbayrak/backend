@@ -5,3 +5,4 @@ use Illuminate\Support\Facades\Route;
 require base_path('routes/v1/user.php');
 require base_path('routes/v1/auth.php');
 require base_path('routes/v1/profile.php');
+require base_path('routes/v1/post.php');
