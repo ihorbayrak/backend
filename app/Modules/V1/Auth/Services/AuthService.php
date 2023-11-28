@@ -9,13 +9,15 @@ use App\Modules\V1\Auth\Exceptions\UserAlreadyExistsException;
 use App\Modules\V1\Auth\Exceptions\WrongEmailException;
 use App\Modules\V1\Auth\Exceptions\WrongPasswordException;
 use App\Modules\V1\User\Repositories\UserRepositoryInterface;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class AuthService
 {
-    public function __construct(private UserRepositoryInterface $userRepository, private HashService $hashService)
-    {
+    public function __construct(
+        private UserRepositoryInterface $userRepository,
+        private HashService $hashService,
+        private VerificationService $verificationService
+    ) {
     }
 
     public function register(RegisterCredentials $dto)
@@ -33,6 +35,8 @@ class AuthService
                 password: $this->hashService->makeHash($dto->password)
             )
         );
+
+        $this->verificationService->sendEmail($user);
 
         $token = Auth::login($user);
 
@@ -63,10 +67,7 @@ class AuthService
     {
         $user = $this->userRepository->findByEmailToken($emailToken);
 
-        $user->update([
-            'email_token' => null,
-            'email_verified_at' => Carbon::now()
-        ]);
+        $this->verificationService->verifyUser($user);
 
         return $user;
     }

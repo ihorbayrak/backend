@@ -7,6 +7,7 @@ use App\Modules\V1\Auth\DTO\LoginCredentials;
 use App\Modules\V1\Auth\DTO\RegisterCredentials;
 use App\Modules\V1\Auth\Requests\LoginUserRequest;
 use App\Modules\V1\Auth\Requests\RegisterUserRequest;
+use App\Modules\V1\Auth\Requests\VerificationTokenRequest;
 use App\Modules\V1\Auth\Services\AuthService;
 use App\Modules\V1\User\Resources\UserResource;
 
@@ -44,6 +45,15 @@ class AuthController extends Controller
         return response()->json([
             'user' => new UserResource($authDto->user),
             'token' => $authDto->token
+        ]);
+    }
+
+    public function verify(VerificationTokenRequest $request)
+    {
+        $this->authService->verify($request->get('token'));
+
+        return response()->json([
+            'message' => 'Email was successfully verified'
         ]);
     }
 
