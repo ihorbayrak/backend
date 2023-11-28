@@ -5,6 +5,7 @@ namespace App\Modules\V1\Post\Services;
 use App\Modules\V1\Base\DTO\PaginateQueryParams;
 use App\Modules\V1\Post\DTO\PostContent;
 use App\Modules\V1\Post\DTO\PostListParams;
+use App\Modules\V1\Post\Exceptions\PostAlreadyLikedException;
 use App\Modules\V1\Post\Exceptions\PostAlreadyRepostedException;
 use App\Modules\V1\Post\Repositories\PostRepositoryInterface;
 use App\Modules\V1\User\Services\UserService;
@@ -66,6 +67,30 @@ class PostService
         $profile = $this->userService->currentUser()->id;
 
         $post->profilesReposted()->detach($profile);
+
+        return $post;
+    }
+
+    public function like($postId)
+    {
+        $post = $this->postRepository->findById($postId);
+        $profile = $this->userService->currentUser()->id;
+
+        if ($post->likedBy($profile)) {
+            throw new PostAlreadyLikedException();
+        }
+
+        $post->profilesLiked()->attach($profile);
+
+        return $post;
+    }
+
+    public function unlike($postId)
+    {
+        $post = $this->postRepository->findById($postId);
+        $profile = $this->userService->currentUser()->id;
+
+        $post->profilesLiked()->detach($profile);
 
         return $post;
     }

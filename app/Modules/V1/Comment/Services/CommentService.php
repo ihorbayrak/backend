@@ -3,12 +3,14 @@
 namespace App\Modules\V1\Comment\Services;
 
 use App\Modules\V1\Comment\DTO\CommentContent;
+use App\Modules\V1\Comment\Exceptions\CommentAlreadyLikedException;
 use App\Modules\V1\Comment\Exceptions\InvalidParentCommentException;
 use App\Modules\V1\Comment\Repositories\CommentRepositoryInterface;
+use App\Modules\V1\User\Services\UserService;
 
 class CommentService
 {
-    public function __construct(private CommentRepositoryInterface $commentRepository)
+    public function __construct(private CommentRepositoryInterface $commentRepository, private UserService $userService)
     {
     }
 
@@ -33,9 +35,32 @@ class CommentService
         return $comment;
     }
 
-
     public function delete($postId, $commentId)
     {
         $this->commentRepository->delete($postId, $commentId);
+    }
+
+    public function like($commentId)
+    {
+        $comment = $this->commentRepository->findById($commentId);
+        $profile = $this->userService->currentUser()->profile->id;
+
+        if ($comment->likedBy($profile)) {
+            throw new CommentAlreadyLikedException();
+        }
+
+        $comment->profilesLiked()->attach($profile);
+
+        return $comment;
+    }
+
+    public function unlike($commentId)
+    {
+        $comment = $this->commentRepository->findById($commentId);
+        $profile = $this->userService->currentUser()->id;
+
+        $comment->profilesLiked()->detach($profile);
+
+        return $comment;
     }
 }
