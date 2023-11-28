@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\V1\User\Exceptions;
+namespace App\Modules\V1\Auth\Exceptions;
 
 use App\Modules\V1\Base\Exceptions\FailedResponseException;
 use Illuminate\Http\Response;

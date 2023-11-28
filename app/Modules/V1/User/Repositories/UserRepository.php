@@ -5,6 +5,7 @@ namespace App\Modules\V1\User\Repositories;
 use App\Models\User;
 use App\Modules\V1\User\DTO\UpdateUserFields;
 use App\Modules\V1\User\Exceptions\UserNotFoundException;
+use App\Modules\V1\Auth\DTO\RegisterCredentials;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -39,6 +40,15 @@ class UserRepository implements UserRepositoryInterface
         ]);
 
         return $user;
+    }
+
+    public function create(RegisterCredentials $data)
+    {
+        return User::create([
+            'name' => $data->name,
+            'email' => $data->email,
+            'password' => $data->password
+        ]);
     }
 
     public function deactivate($userId)

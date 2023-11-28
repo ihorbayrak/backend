@@ -2,9 +2,9 @@
 
 namespace App\Modules\V1\User\Services;
 
+use App\Modules\V1\Auth\Exceptions\WrongPasswordException;
 use App\Modules\V1\User\DTO\ChangePassword;
 use App\Modules\V1\User\DTO\UpdateUserFields;
-use App\Modules\V1\User\Exceptions\WrongPasswordException;
 use App\Modules\V1\User\Repositories\UserRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
 
