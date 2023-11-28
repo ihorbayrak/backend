@@ -9,7 +9,6 @@ use App\Modules\V1\User\Requests\ChangeUserPasswordRequest;
 use App\Modules\V1\User\Requests\UpdateUserRequest;
 use App\Modules\V1\User\Resources\UserResource;
 use App\Modules\V1\User\Services\UserService;
-use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -17,15 +16,15 @@ class UserController extends Controller
     {
     }
 
-    public function show(Request $request)
+    public function show()
     {
-        return new UserResource($request->user());
+        return new UserResource($this->userService->currentUser());
     }
 
     public function update(UpdateUserRequest $request)
     {
         $dto = new UpdateUserFields(
-            id: $request->user()->id,
+            id: $this->userService->currentUserId(),
             name: $request->get('name'),
             email: $request->get('email'),
         );
@@ -38,7 +37,7 @@ class UserController extends Controller
     public function changePassword(ChangeUserPasswordRequest $request)
     {
         $dto = new ChangePassword(
-            id: $request->user()->id,
+            id: $this->userService->currentUserId(),
             newPassword: $request->input('new_password'),
             oldPassword: $request->input('old_password')
         );
@@ -51,9 +50,9 @@ class UserController extends Controller
         ]);
     }
 
-    public function destroy(Request $request)
+    public function destroy()
     {
-        $this->userService->delete($request->user()->id);
+        $this->userService->delete($this->userService->currentUserId());
 
         return response()->noContent();
     }

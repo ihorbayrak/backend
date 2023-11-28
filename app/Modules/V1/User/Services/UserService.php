@@ -7,6 +7,7 @@ use App\Modules\V1\Auth\Services\HashService;
 use App\Modules\V1\User\DTO\ChangePassword;
 use App\Modules\V1\User\DTO\UpdateUserFields;
 use App\Modules\V1\User\Repositories\UserRepositoryInterface;
+use Illuminate\Support\Facades\Auth;
 
 class UserService
 {
@@ -43,5 +44,15 @@ class UserService
     public function restore($userId)
     {
         return $this->userRepository->restore($userId);
+    }
+
+    public function currentUser()
+    {
+        return Auth::user();
+    }
+
+    public function currentUserId()
+    {
+        return Auth::id();
     }
 }
