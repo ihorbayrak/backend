@@ -3,14 +3,14 @@
 namespace App\Modules\V1\User\Services;
 
 use App\Modules\V1\Auth\Exceptions\WrongPasswordException;
+use App\Modules\V1\Auth\Services\HashService;
 use App\Modules\V1\User\DTO\ChangePassword;
 use App\Modules\V1\User\DTO\UpdateUserFields;
 use App\Modules\V1\User\Repositories\UserRepositoryInterface;
-use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
-    public function __construct(private UserRepositoryInterface $userRepository)
+    public function __construct(private UserRepositoryInterface $userRepository, private HashService $hashService)
     {
     }
 
@@ -23,12 +23,12 @@ class UserService
     {
         $user = $this->userRepository->findById($dto->id);
 
-        if (!Hash::check($dto->oldPassword, $user->password)) {
+        if ($this->hashService->isNotEquals($dto->oldPassword, $user->password)) {
             throw new WrongPasswordException();
         }
 
         $user->update([
-            'password' => Hash::make($dto->newPassword)
+            'password' => $this->hashService->makeHash($dto->newPassword)
         ]);
 
         return $user;

@@ -11,11 +11,10 @@ use App\Modules\V1\Auth\Exceptions\WrongPasswordException;
 use App\Modules\V1\User\Repositories\UserRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
-    public function __construct(private UserRepositoryInterface $userRepository)
+    public function __construct(private UserRepositoryInterface $userRepository, private HashService $hashService)
     {
     }
 
@@ -31,7 +30,7 @@ class AuthService
             new RegisterCredentials(
                 name: $dto->name,
                 email: $dto->email,
-                password: Hash::make($dto->password)
+                password: $this->hashService->makeHash($dto->password)
             )
         );
 
@@ -48,7 +47,7 @@ class AuthService
             throw new WrongEmailException();
         }
 
-        if (!Hash::check($dto->password, $user->password)) {
+        if ($this->hashService->isNotEquals($dto->password, $user->password)) {
             throw new WrongPasswordException();
         }
 
