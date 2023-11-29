@@ -11,6 +11,7 @@ Route::controller(UserController::class)->group(function () {
             Route::delete('/user', 'destroy')->name('deactivate');
         });
 
+        Route::post('/user/{user}/restore-request', 'restoreRequest')->name('restore-request');
         Route::post('/user/{user}/restore', 'restore')->name('restore');
     });
 });
