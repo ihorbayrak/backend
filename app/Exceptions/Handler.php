@@ -2,7 +2,10 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Response;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -26,5 +29,28 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request, Throwable $e)
+    {
+        if ($request->wantsJson() || $request->is('api/*')) {
+            if ($e instanceof AuthorizationException) {
+                return response()->json([
+                    'success' => false,
+                    'status' => Response::HTTP_FORBIDDEN,
+                    'message' => 'Unauthenticated',
+                ], Response::HTTP_FORBIDDEN);
+            }
+
+            if ($e instanceof AuthenticationException) {
+                return response()->json([
+                    'success' => false,
+                    'status' => Response::HTTP_UNAUTHORIZED,
+                    'message' => 'Unauthorized',
+                ], Response::HTTP_UNAUTHORIZED);
+            }
+        }
+
+        return parent::render($request, $e);
     }
 }

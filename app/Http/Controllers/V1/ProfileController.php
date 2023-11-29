@@ -8,6 +8,7 @@ use App\Modules\V1\User\Requests\UpdateProfileRequest;
 use App\Modules\V1\User\Resources\ProfileInfoResource;
 use App\Modules\V1\User\Resources\ProfileResource;
 use App\Modules\V1\User\Services\ProfileService;
+use App\Policies\Abilities;
 
 class ProfileController extends ResponseController
 {
@@ -28,6 +29,8 @@ class ProfileController extends ResponseController
 
     public function update(UpdateProfileRequest $request, $username)
     {
+        $this->authorize(Abilities::UPDATE, $this->profileRepository->findByUsername($username));
+
         $dto = new UpdateProfileFields(
             username: $request->get('username'),
             bio: $request->get('bio'),

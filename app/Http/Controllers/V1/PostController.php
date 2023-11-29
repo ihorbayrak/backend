@@ -14,6 +14,7 @@ use App\Modules\V1\Post\Resources\PostResource;
 use App\Modules\V1\Post\Resources\PostsCollection;
 use App\Modules\V1\Post\Services\PostService;
 use App\Modules\V1\User\Services\UserService;
+use App\Policies\Abilities;
 
 class PostController extends ResponseController
 {
@@ -86,6 +87,8 @@ class PostController extends ResponseController
 
     public function update(UpdatePostRequest $request, $postId)
     {
+        $this->authorize(Abilities::UPDATE, $this->postRepository->findById($postId));
+
         $post = $this->postService->update(
             $postId,
             new PostContent(
@@ -103,6 +106,8 @@ class PostController extends ResponseController
 
     public function destroy($postId)
     {
+        $this->authorize(Abilities::DELETE, $this->postRepository->findById($postId));
+
         $this->postService->delete($postId);
 
         return response()->noContent();

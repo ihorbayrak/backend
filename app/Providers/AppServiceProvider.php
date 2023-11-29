@@ -32,6 +32,8 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(ImageHandlerInterface::class, InterventionImageHandler::class);
         $this->app->bind(GeolocationServiceInterface::class, IpApiService::class);
+
+        $this->bindRepositories();
     }
 
     /**

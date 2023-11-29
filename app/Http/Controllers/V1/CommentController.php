@@ -8,6 +8,7 @@ use App\Modules\V1\Comment\Requests\CreateCommentRequest;
 use App\Modules\V1\Comment\Resources\CommentResource;
 use App\Modules\V1\Comment\Services\CommentService;
 use App\Modules\V1\User\Services\UserService;
+use App\Policies\Abilities;
 
 class CommentController extends ResponseController
 {
@@ -56,6 +57,8 @@ class CommentController extends ResponseController
 
     public function destroy($postId, $commentId)
     {
+        $this->authorize(Abilities::DELETE, $this->commentRepository->findById($commentId));
+
         $this->commentService->delete($postId, $commentId);
 
         return response()->noContent();
