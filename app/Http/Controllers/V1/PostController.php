@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Http\Controllers\Controller;
 use App\Modules\V1\Base\DTO\PaginateQueryParams;
 use App\Modules\V1\Base\Requests\PaginateRequest;
 use App\Modules\V1\Post\DTO\PostContent;
@@ -16,7 +15,7 @@ use App\Modules\V1\Post\Resources\PostsCollection;
 use App\Modules\V1\Post\Services\PostService;
 use App\Modules\V1\User\Services\UserService;
 
-class PostController extends Controller
+class PostController extends ResponseController
 {
     public function __construct(
         private PostService $postService,
@@ -38,9 +37,9 @@ class PostController extends Controller
 
         $posts = $this->postService->list($paginateDto, $postListDto);
 
-        return response()->json([
-            'data' => new PostsCollection($posts)
-        ]);
+        return $this->responseOk(
+            ['data' => new PostsCollection($posts)]
+        );
     }
 
     public function feed(PaginateRequest $request)
@@ -52,7 +51,7 @@ class PostController extends Controller
 
         $posts = $this->postService->feed($paginateDto);
 
-        return response()->json([
+        return $this->responseOk([
             'data' => new PostsCollection($posts)
         ]);
     }
@@ -61,7 +60,7 @@ class PostController extends Controller
     {
         $post = $this->postRepository->findById($postId, ['profilesLiked', 'profilesReposted']);
 
-        return response()->json([
+        return $this->responseOk([
             'post' => new PostResource($post)
         ]);
     }
@@ -77,10 +76,12 @@ class PostController extends Controller
             )
         );
 
-        return response()->json([
-            'message' => 'Post created successfully',
-            'post' => new PostResource($post)
-        ]);
+        return $this->responseCreated(
+            [
+                'message' => 'Post created successfully',
+                'post' => new PostResource($post)
+            ]
+        );
     }
 
     public function update(UpdatePostRequest $request, $postId)
@@ -95,7 +96,9 @@ class PostController extends Controller
             )
         );
 
-        return response()->json(['post' => new PostResource($post)]);
+        return $this->responseOk(
+            ['post' => new PostResource($post)]
+        );
     }
 
     public function destroy($postId)

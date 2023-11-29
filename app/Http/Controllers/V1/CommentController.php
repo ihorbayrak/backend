@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Http\Controllers\Controller;
 use App\Modules\V1\Comment\DTO\CommentContent;
 use App\Modules\V1\Comment\Repositories\CommentRepositoryInterface;
 use App\Modules\V1\Comment\Requests\CreateCommentRequest;
@@ -10,7 +9,7 @@ use App\Modules\V1\Comment\Resources\CommentResource;
 use App\Modules\V1\Comment\Services\CommentService;
 use App\Modules\V1\User\Services\UserService;
 
-class CommentController extends Controller
+class CommentController extends ResponseController
 {
     public function __construct(
         private CommentService $commentService,
@@ -23,7 +22,9 @@ class CommentController extends Controller
     {
         $comments = $this->commentService->all($postId);
 
-        return response()->json(['comments' => CommentResource::collection($comments)]);
+        return $this->responseOk([
+            'comments' => CommentResource::collection($comments)
+        ]);
     }
 
     public function store(CreateCommentRequest $request, $postId)
@@ -38,7 +39,7 @@ class CommentController extends Controller
             )
         );
 
-        return response()->json([
+        return $this->responseCreated([
             'message' => "Comment created successfully",
             'comment' => new CommentResource($comment)
         ]);
@@ -48,7 +49,7 @@ class CommentController extends Controller
     {
         $comment = $this->commentRepository->findByIdWithPost($postId, $commentId);
 
-        return response()->json([
+        return $this->responseOk([
             'comment' => new CommentResource($comment)
         ]);
     }

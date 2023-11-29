@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Http\Controllers\Controller;
 use App\Modules\V1\User\DTO\UpdateProfileFields;
 use App\Modules\V1\User\Repositories\ProfileRepositoryInterface;
 use App\Modules\V1\User\Requests\UpdateProfileRequest;
 use App\Modules\V1\User\Resources\ProfileInfoResource;
+use App\Modules\V1\User\Resources\ProfileResource;
 use App\Modules\V1\User\Services\ProfileService;
 
-class ProfileController extends Controller
+class ProfileController extends ResponseController
 {
     public function __construct(
         private ProfileService $profileService,
@@ -21,7 +21,9 @@ class ProfileController extends Controller
     {
         $profile = $this->profileRepository->findByUsername($username);
 
-        return response()->json(new ProfileInfoResource($profile));
+        return $this->responseOk(
+            ['profile' => new ProfileInfoResource($profile)]
+        );
     }
 
     public function update(UpdateProfileRequest $request, $username)
@@ -29,39 +31,49 @@ class ProfileController extends Controller
         $dto = new UpdateProfileFields(
             username: $request->get('username'),
             bio: $request->get('bio'),
-            avatar: $request->get('avatar')
+            avatar: $request->file('avatar')
         );
 
         $profile = $this->profileService->update($username, $dto);
 
-        return response()->json(new ProfileInfoResource($profile));
+        return $this->responseOk(
+            ['profile' => new ProfileInfoResource($profile)]
+        );
     }
 
     public function follow($username)
     {
         $profile = $this->profileService->follow($username);
 
-        return response()->json(new ProfileInfoResource($profile));
+        return $this->responseOk(
+            ['profile' => new ProfileInfoResource($profile)]
+        );
     }
 
     public function unfollow($username)
     {
         $profile = $this->profileService->unfollow($username);
 
-        return response()->json(new ProfileInfoResource($profile));
+        return $this->responseOk([
+            'profile' => new ProfileInfoResource($profile)
+        ]);
     }
 
     public function followers($username)
     {
         $followers = $this->profileService->followers($username);
 
-        return response()->json(ProfileInfoResource::collection($followers));
+        return $this->responseOk([
+            'followers' => ProfileResource::collection($followers)
+        ]);
     }
 
     public function following($username)
     {
         $following = $this->profileService->following($username);
 
-        return response()->json(ProfileInfoResource::collection($following));
+        return $this->responseOk([
+            'following' => ProfileResource::collection($following)
+        ]);
     }
 }
