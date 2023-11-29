@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Modules\V1\Search\Services\Elasticsearch\Searchable;
+use App\Modules\V1\Search\Services\Elasticsearch\SearchableTrait;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -51,9 +53,9 @@ use Illuminate\Support\Facades\Storage;
  * @method static \Illuminate\Database\Eloquent\Builder|Profile withoutTrashed()
  * @mixin \Eloquent
  */
-class Profile extends Model
+class Profile extends Model implements Searchable
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, SearchableTrait;
 
     const MAX_BIO_CHARS = 180;
     const AVATAR_WIDTH = 180;
@@ -125,5 +127,12 @@ class Profile extends Model
     public function isFollower($followerId)
     {
         return $this->followers()->whereKey($followerId)->exists();
+    }
+
+    public function toArray(): array
+    {
+        $profile = parent::toArray();
+
+        return array_merge($profile, $this->user->toArray());
     }
 }

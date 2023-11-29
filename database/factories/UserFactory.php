@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Modules\V1\Geolocation\VO\Coordinates;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 
@@ -24,6 +25,7 @@ class UserFactory extends Factory
             'created_at' => $createdAt = fake()->dateTimeThisYear(),
             'updated_at' => fake()->optional(50, $createdAt)->dateTimeBetween($createdAt),
             'email_verified_at' => fake()->optional(25, $createdAt)->dateTimeBetween($createdAt),
+            'location' => Coordinates::from(fake()->latitude(), fake()->longitude())
         ];
     }
 }

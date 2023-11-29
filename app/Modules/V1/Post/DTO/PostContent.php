@@ -9,7 +9,8 @@ class PostContent
     public function __construct(
         public readonly int $profileId,
         public readonly ?string $body,
-        public readonly ?UploadedFile $image
+        public readonly ?UploadedFile $image,
+        public readonly ?string $ip
     ) {
     }
 }

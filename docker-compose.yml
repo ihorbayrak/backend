@@ -46,3 +46,14 @@ services:
         container_name: app-redis
         volumes:
             - ./storage/redis:/data
+
+    #Elasticsearch Service
+    elasticsearch:
+        image: elasticsearch:8.11.0
+        container_name: app-search
+        ports:
+            - "9200:9200"
+        environment:
+            - discovery.type=single-node
+            - xpack.security.enabled=false
+            - bootstrap.memory_lock=true

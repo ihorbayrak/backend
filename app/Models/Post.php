@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Casts\GeoCoordinates;
+use App\Modules\V1\Search\Services\Elasticsearch\Searchable;
+use App\Modules\V1\Search\Services\Elasticsearch\SearchableTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -35,9 +38,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Post whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Post extends Model
+class Post extends Model implements Searchable
 {
-    use HasFactory;
+    use HasFactory, SearchableTrait;
 
     const MAX_CHAR = 320;
 
@@ -45,11 +48,16 @@ class Post extends Model
         'profile_id',
         'body',
         'image',
-        'activity'
+        'activity',
+        'location'
     ];
 
     protected $with = [
         'profile'
+    ];
+
+    protected $casts = [
+        'location' => GeoCoordinates::class
     ];
 
     public function profile()

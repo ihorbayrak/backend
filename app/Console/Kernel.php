@@ -2,11 +2,18 @@
 
 namespace App\Console;
 
+use App\Console\Commands\ReindexPost;
+use App\Console\Commands\ReindexProfile;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
+    protected $commands = [
+        ReindexPost::class,
+        ReindexProfile::class
+    ];
+
     /**
      * Define the application's command schedule.
      */

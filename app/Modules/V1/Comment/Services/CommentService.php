@@ -6,12 +6,16 @@ use App\Modules\V1\Comment\DTO\CommentContent;
 use App\Modules\V1\Comment\Exceptions\CommentAlreadyLikedException;
 use App\Modules\V1\Comment\Exceptions\InvalidParentCommentException;
 use App\Modules\V1\Comment\Repositories\CommentRepositoryInterface;
+use App\Modules\V1\Post\Actions\CalculateActivityAction;
 use App\Modules\V1\User\Services\UserService;
 
 class CommentService
 {
-    public function __construct(private CommentRepositoryInterface $commentRepository, private UserService $userService)
-    {
+    public function __construct(
+        private CommentRepositoryInterface $commentRepository,
+        private UserService $userService,
+        private CalculateActivityAction $calculateActivity
+    ) {
     }
 
     public function all($postId)
@@ -31,6 +35,10 @@ class CommentService
         }
 
         $comment = $this->commentRepository->create($dto, $postId);
+
+        $comment->post()->update([
+            'activity' => $this->calculateActivity->handle($comment->post)
+        ]);
 
         return $comment;
     }

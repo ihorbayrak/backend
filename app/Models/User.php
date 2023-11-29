@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Casts\GeoCoordinates;
+use App\Modules\V1\Search\Services\Elasticsearch\Searchable;
+use App\Modules\V1\Search\Services\Elasticsearch\SearchableTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -41,16 +44,17 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
  * @method static \Illuminate\Database\Eloquent\Builder|User withoutTrashed()
  * @mixin \Eloquent
  */
-class User extends Authenticatable implements JWTSubject
+class User extends Authenticatable implements JWTSubject, Searchable
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes, SearchableTrait;
 
     protected $fillable = [
         'name',
         'email',
         'email_token',
         'email_verified_at',
-        'password'
+        'password',
+        'location'
     ];
 
     protected $hidden = [
@@ -60,7 +64,8 @@ class User extends Authenticatable implements JWTSubject
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed'
+        'password' => 'hashed',
+        'location' => GeoCoordinates::class
     ];
 
     public function getJWTIdentifier()
@@ -76,5 +81,15 @@ class User extends Authenticatable implements JWTSubject
     public function profile()
     {
         return $this->hasOne(Profile::class);
+    }
+
+    public function getSearchIndex()
+    {
+        return $this->profile->getSearchIndex();
+    }
+
+    public function getSearchType()
+    {
+        return $this->profile->getSearchType();
     }
 }
