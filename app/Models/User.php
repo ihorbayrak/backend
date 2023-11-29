@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\GeoCoordinates;
 use App\Modules\V1\Search\Services\Elasticsearch\Searchable;
 use App\Modules\V1\Search\Services\Elasticsearch\SearchableTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -63,7 +64,8 @@ class User extends Authenticatable implements JWTSubject, Searchable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed'
+        'password' => 'hashed',
+        'location' => GeoCoordinates::class
     ];
 
     public function getJWTIdentifier()

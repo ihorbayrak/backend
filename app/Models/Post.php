@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\GeoCoordinates;
 use App\Modules\V1\Search\Services\Elasticsearch\Searchable;
 use App\Modules\V1\Search\Services\Elasticsearch\SearchableTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -53,6 +54,10 @@ class Post extends Model implements Searchable
 
     protected $with = [
         'profile'
+    ];
+
+    protected $casts = [
+        'location' => GeoCoordinates::class
     ];
 
     public function profile()

@@ -22,7 +22,8 @@ class AuthController extends Controller
         $dto = new RegisterCredentials(
             name: $request->get('name'),
             email: $request->get('email'),
-            password: $request->get('password')
+            password: $request->get('password'),
+            ip: $request->ip()
         );
 
         $authDto = $this->authService->register($dto);
@@ -37,7 +38,8 @@ class AuthController extends Controller
     {
         $dto = new LoginCredentials(
             email: $request->get('email'),
-            password: $request->get('password')
+            password: $request->get('password'),
+            ip: $request->ip()
         );
 
         $authDto = $this->authService->login($dto);

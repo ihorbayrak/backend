@@ -8,7 +8,9 @@ use App\Modules\V1\Auth\DTO\RegisterCredentials;
 use App\Modules\V1\Auth\Exceptions\UserAlreadyExistsException;
 use App\Modules\V1\Auth\Exceptions\WrongEmailException;
 use App\Modules\V1\Auth\Exceptions\WrongPasswordException;
+use App\Modules\V1\User\Jobs\ProcessLocationJob;
 use App\Modules\V1\User\Repositories\UserRepositoryInterface;
+use App\Modules\V1\User\Services\ProfileService;
 use Illuminate\Support\Facades\Auth;
 
 class AuthService
@@ -16,7 +18,8 @@ class AuthService
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private HashService $hashService,
-        private VerificationService $verificationService
+        private VerificationService $verificationService,
+        private ProfileService $profileService
     ) {
     }
 
@@ -40,6 +43,12 @@ class AuthService
 
         $token = Auth::login($user);
 
+        $this->profileService->generateProfile($user);
+
+        if ($dto->ip) {
+            ProcessLocationJob::dispatch($user, $dto->ip);
+        }
+
         return new AuthUser(user: $user, token: $token);
     }
 
@@ -59,6 +68,10 @@ class AuthService
             'email' => $dto->email,
             'password' => $dto->password
         ]);
+
+        if ($dto->ip) {
+            ProcessLocationJob::dispatch($user, $dto->ip);
+        }
 
         return new AuthUser(user: $user, token: $token);
     }

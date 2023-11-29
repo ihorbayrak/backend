@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Post;
 use App\Models\Profile;
+use App\Modules\V1\Geolocation\VO\Coordinates;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,6 +26,7 @@ class PostFactory extends Factory
             'body' => fake()->optional(50)->text(Post::MAX_CHAR),
             'image' => null,
             'activity' => fake()->randomFloat(1, 0, 100),
+            'location' => Coordinates::from(fake()->latitude(), fake()->longitude()),
             'created_at' => function (array $attributes) {
                 $profile = Profile::find($attributes['profile_id']);
 

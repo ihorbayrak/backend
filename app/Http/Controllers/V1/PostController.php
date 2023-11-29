@@ -72,7 +72,8 @@ class PostController extends Controller
             new PostContent(
                 profileId: $this->userService->currentUser()->id,
                 body: $request->get('body'),
-                image: $request->file('image')
+                image: $request->file('image'),
+                ip: $request->ip()
             )
         );
 
@@ -89,7 +90,8 @@ class PostController extends Controller
             new PostContent(
                 profileId: $this->userService->currentUser()->id,
                 body: $request->get('body'),
-                image: $request->file('image')
+                image: $request->file('image'),
+                ip: $request->ip()
             )
         );
 
