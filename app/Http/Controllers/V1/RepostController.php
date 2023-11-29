@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Http\Controllers\Controller;
 use App\Modules\V1\Post\Resources\PostResource;
 use App\Modules\V1\Post\Services\PostService;
 
-class RepostController extends Controller
+class RepostController extends ResponseController
 {
     public function __construct(private PostService $postService)
     {
@@ -16,7 +15,7 @@ class RepostController extends Controller
     {
         $post = $this->postService->repost($postId);
 
-        return response()->json([
+        return $this->responseOk([
             'post' => new PostResource($post)
         ]);
     }
@@ -25,8 +24,8 @@ class RepostController extends Controller
     {
         $post = $this->postService->removeRepost($postId);
 
-        return response()->json([
-            'post' => new PostResource($post)
-        ]);
+        return $this->responseOk(
+            ['post' => new PostResource($post)]
+        );
     }
 }

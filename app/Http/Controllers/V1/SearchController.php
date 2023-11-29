@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\V1;
 
-use App\Http\Controllers\Controller;
 use App\Modules\V1\Search\DTO\SearchParams;
 use App\Modules\V1\Search\Requests\SearchRequest;
 use App\Modules\V1\Search\Services\SearchService;
 
-class SearchController extends Controller
+class SearchController extends ResponseController
 {
     public function __construct(private SearchService $searchService)
     {
@@ -24,7 +23,7 @@ class SearchController extends Controller
             )
         );
 
-        return response()->json([
+        return $this->responseOk([
             'data' => $data
         ]);
     }

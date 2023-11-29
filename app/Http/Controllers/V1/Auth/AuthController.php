@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V1\Auth;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\V1\ResponseController;
 use App\Modules\V1\Auth\DTO\LoginCredentials;
 use App\Modules\V1\Auth\DTO\RegisterCredentials;
 use App\Modules\V1\Auth\Requests\LoginUserRequest;
@@ -11,7 +11,7 @@ use App\Modules\V1\Auth\Requests\VerificationTokenRequest;
 use App\Modules\V1\Auth\Services\AuthService;
 use App\Modules\V1\User\Resources\UserResource;
 
-class AuthController extends Controller
+class AuthController extends ResponseController
 {
     public function __construct(private AuthService $authService)
     {
@@ -28,10 +28,7 @@ class AuthController extends Controller
 
         $authDto = $this->authService->register($dto);
 
-        return response()->json([
-            'user' => new UserResource($authDto->user),
-            'token' => $authDto->token
-        ]);
+        return $this->responseWithToken(new UserResource($authDto->user), $authDto->token);
     }
 
     public function login(LoginUserRequest $request)
@@ -44,17 +41,14 @@ class AuthController extends Controller
 
         $authDto = $this->authService->login($dto);
 
-        return response()->json([
-            'user' => new UserResource($authDto->user),
-            'token' => $authDto->token
-        ]);
+        return $this->responseWithToken(new UserResource($authDto->user), $authDto->token);
     }
 
     public function verify(VerificationTokenRequest $request)
     {
         $this->authService->verify($request->get('token'));
 
-        return response()->json([
+        return $this->responseOk([
             'message' => 'Email was successfully verified'
         ]);
     }
@@ -63,7 +57,9 @@ class AuthController extends Controller
     {
         $token = $this->authService->refresh();
 
-        return response()->json(['token' => $token]);
+        return $this->responseOk(
+            ['token' => $token]
+        );
     }
 
     public function logout()
