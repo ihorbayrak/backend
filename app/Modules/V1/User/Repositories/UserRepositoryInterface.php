@@ -13,6 +13,8 @@ interface UserRepositoryInterface
 
     public function findByEmailToken($emailToken);
 
+    public function findDeleted($userId);
+
     public function update(UpdateUserFields $data);
 
     public function create(RegisterCredentials $data);
@@ -20,4 +22,6 @@ interface UserRepositoryInterface
     public function deactivate($userId);
 
     public function restore($userId);
+
+    public function deleteExpiredAccount();
 }

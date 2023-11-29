@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\V1\User\DTO\ChangePassword;
 use App\Modules\V1\User\DTO\UpdateUserFields;
 use App\Modules\V1\User\Requests\ChangeUserPasswordRequest;
+use App\Modules\V1\User\Requests\RestoreRequest;
 use App\Modules\V1\User\Requests\UpdateUserRequest;
 use App\Modules\V1\User\Resources\UserResource;
 use App\Modules\V1\User\Services\UserService;
@@ -57,9 +58,19 @@ class UserController extends Controller
         return response()->noContent();
     }
 
-    public function restore($userId)
+
+    public function restoreRequest($userId)
     {
-        $user = $this->userService->restore($userId);
+        $this->userService->restoreRequest($userId);
+
+        return response()->json([
+            'message' => 'Сode was sent'
+        ]);
+    }
+
+    public function restore(RestoreRequest $request, $userId)
+    {
+        $user = $this->userService->restore($userId, $request->get('code'));
 
         return response()->json([
             'user_id' => $user->id,

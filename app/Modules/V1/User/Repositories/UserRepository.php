@@ -4,8 +4,12 @@ namespace App\Modules\V1\User\Repositories;
 
 use App\Models\User;
 use App\Modules\V1\User\DTO\UpdateUserFields;
+use App\Modules\V1\User\Exceptions\DeactivatingFailedException;
+use App\Modules\V1\User\Exceptions\RestoringFailedException;
 use App\Modules\V1\User\Exceptions\UserNotFoundException;
 use App\Modules\V1\Auth\DTO\RegisterCredentials;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -28,6 +32,17 @@ class UserRepository implements UserRepositoryInterface
     public function findByEmailToken($emailToken)
     {
         return User::where('email_token', $emailToken)->first();
+    }
+
+    public function findDeleted($userId)
+    {
+        $user = User::withTrashed()->find($userId);
+
+        if (!$user) {
+            throw new UserNotFoundException();
+        }
+
+        return $user;
     }
 
     public function update(UpdateUserFields $data)
@@ -55,13 +70,49 @@ class UserRepository implements UserRepositoryInterface
     {
         $user = $this->findById($userId);
 
-        return $user->delete();
+        try {
+            DB::beginTransaction();
+
+            $user->delete();
+            $user->profile->delete();
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            throw new DeactivatingFailedException();
+        }
     }
 
     public function restore($userId)
     {
-        $user = $this->findById($userId);
+        $user = $this->findDeleted($userId);
 
-        return $user->restore();
+        try {
+            DB::beginTransaction();
+
+            $user->restore();
+            $user->profile()->withTrashed()->restore();
+
+            DB::commit();
+
+            return $user;
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            throw new RestoringFailedException();
+        }
+    }
+
+    public function deleteExpiredAccount()
+    {
+        User::withTrashed()
+            ->whereNotNull('deleted_at')
+            ->get()
+            ->each(function (User $user) {
+                if (Carbon::now()->diffInDays($user->deleted_at) >= config('auth.days_to_activate_account')) {
+                    $user->forceDelete();
+                };
+            });
     }
 }

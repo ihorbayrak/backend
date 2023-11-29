@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\DeleteDeactivatedUsersCommand;
 use App\Console\Commands\ReindexPost;
 use App\Console\Commands\ReindexProfile;
 use Illuminate\Console\Scheduling\Schedule;
@@ -11,7 +12,8 @@ class Kernel extends ConsoleKernel
 {
     protected $commands = [
         ReindexPost::class,
-        ReindexProfile::class
+        ReindexProfile::class,
+        DeleteDeactivatedUsersCommand::class
     ];
 
     /**
@@ -19,7 +21,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('delete:deactivated-users')->daily();
     }
 
     /**
