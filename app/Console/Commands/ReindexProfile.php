@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Profile;
-use App\Modules\V1\Search\Repositories\Profiles\ProfileSearchRepositoryInterface;
+use App\Modules\V1\Search\Repositories\SearchRepositoryInterface;
 use Illuminate\Console\Command;
 
 class ReindexProfile extends Command
@@ -22,7 +22,7 @@ class ReindexProfile extends Command
      */
     protected $description = 'Indexes all profiles to Elasticsearch';
 
-    public function __construct(private ProfileSearchRepositoryInterface $profileSearchRepository)
+    public function __construct(private SearchRepositoryInterface $searchRepository)
     {
         parent::__construct();
     }
@@ -34,16 +34,18 @@ class ReindexProfile extends Command
     {
         $this->info('Indexing all profiles. This might take a while...');
 
-        if ($this->profileSearchRepository->checkIndexExists()) {
-            $this->profileSearchRepository->deleteIndex();
+        $repository = $this->searchRepository->for(Profile::class);
+
+        if ($repository->checkIndexExists()) {
+            $repository->deleteIndex();
         }
 
-        $this->profileSearchRepository->createIndex();
+        $repository->createIndex();
 
-        $this->profileSearchRepository->putMappings(config('elasticsearch.parameters.profiles.mappings'));
+        $repository->putMappings(config('elasticsearch.parameters.profiles.mappings'));
 
         foreach (Profile::cursor() as $profile) {
-            $this->profileSearchRepository->saveIndex($profile->toSearchArray());
+            $repository->saveIndex($profile->toSearchArray());
 
             $this->output->write('.');
         }

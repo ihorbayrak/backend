@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Post;
-use App\Modules\V1\Search\Repositories\Posts\PostSearchRepositoryInterface;
+use App\Modules\V1\Search\Repositories\SearchRepositoryInterface;
 use Illuminate\Console\Command;
 
 class ReindexPost extends Command
@@ -22,7 +22,7 @@ class ReindexPost extends Command
      */
     protected $description = 'Indexes all posts to Elasticsearch';
 
-    public function __construct(private PostSearchRepositoryInterface $postSearchRepository)
+    public function __construct(private SearchRepositoryInterface $searchRepository)
     {
         parent::__construct();
     }
@@ -34,16 +34,18 @@ class ReindexPost extends Command
     {
         $this->info('Indexing all posts. This might take a while...');
 
-        if ($this->postSearchRepository->checkIndexExists()) {
-            $this->postSearchRepository->deleteIndex();
+        $repository = $this->searchRepository->for(Post::class);
+
+        if ($repository->checkIndexExists()) {
+            $repository->deleteIndex();
         }
 
-        $this->postSearchRepository->createIndex();
+        $repository->createIndex();
 
-        $this->postSearchRepository->putMappings(config('elasticsearch.parameters.posts.mappings'));
+        $repository->putMappings(config('elasticsearch.parameters.posts.mappings'));
 
         foreach (Post::cursor() as $post) {
-            $this->postSearchRepository->saveIndex($post->toSearchArray());
+            $repository->saveIndex($post->toSearchArray());
 
             $this->output->write('.');
         }
