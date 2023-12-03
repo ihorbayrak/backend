@@ -1,23 +1,38 @@
 <?php
 
-namespace App\Modules\V1\Search\Services\Elasticsearch;
+namespace App\Modules\V1\Search\Repositories\Elasticsearch;
 
+use App\Modules\V1\Search\DTO\SearchFilters;
+use App\Modules\V1\Search\Repositories\SearchRepositoryInterface;
+use App\Modules\V1\Search\Services\Elasticsearch\ElasticseearchFactory;
 use Elastic\Elasticsearch\Client;
-use Elastic\Elasticsearch\ClientBuilder;
-use InvalidArgumentException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 
-class ElasticsearchRepository
+class ElasticsearchRepository implements SearchRepositoryInterface
 {
     protected const MAX_RESULTS = 5000;
-    protected Client $elasticsearch;
+    protected Model $model;
 
-    public function __construct(protected Model $model)
+    public function __construct(protected Client $elasticsearch)
     {
-        $this->elasticsearch = ClientBuilder::create()
-            ->setHosts(config('elasticsearch.client.hosts'))
-            ->build();
+    }
+
+    public function for($modelName)
+    {
+        $model = "\\".$modelName; // Set fully qualified namespace
+
+        $this->model = (new $model());
+
+        return $this;
+    }
+
+    public function search($query, SearchFilters $filters)
+    {
+        $repository = ElasticseearchFactory::make($this->model::class);
+
+        return $this->searchOnElasticsearch($repository->search($query, $filters));
     }
 
     protected function searchOnElasticsearch(array $data)
