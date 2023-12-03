@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modules\V1\Search\Repositories\Profiles;
+namespace App\Modules\V1\Search\Repositories;
 
 use App\Modules\V1\Search\DTO\SearchFilters;
 
-interface ProfileSearchRepositoryInterface
+interface SearchRepositoryInterface
 {
     public function search($query, SearchFilters $filters);
 }

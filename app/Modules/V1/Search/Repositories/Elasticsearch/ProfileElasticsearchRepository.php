@@ -1,19 +1,13 @@
 <?php
 
-namespace App\Modules\V1\Search\Repositories\Profiles;
+namespace App\Modules\V1\Search\Repositories\Elasticsearch;
 
 use App\Models\Profile;
 use App\Modules\V1\Search\DTO\SearchFilters;
-use App\Modules\V1\Search\Services\Elasticsearch\ElasticsearchRepository;
 use App\Modules\V1\User\Services\UserService;
 
-class ProfileElasticsearchRepository extends ElasticsearchRepository implements ProfileSearchRepositoryInterface
+class ProfileElasticsearchRepository
 {
-    public function __construct(private Profile $profile)
-    {
-        parent::__construct($this->profile);
-    }
-
     public function search($query, SearchFilters $filters)
     {
         $result = [
@@ -38,7 +32,7 @@ class ProfileElasticsearchRepository extends ElasticsearchRepository implements 
             $this->filterByLocation($result, $this->getCurrentProfile());
         }
 
-        return $this->searchOnElasticsearch($result);
+        return $result;
     }
 
     private function filterbyFollows(array &$result, Profile $authProfile)
