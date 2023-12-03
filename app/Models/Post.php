@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Casts\GeoCoordinates;
 use App\Modules\V1\Search\Services\Elasticsearch\Searchable;
-use App\Modules\V1\Search\Services\Elasticsearch\SearchableTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -38,9 +37,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Post whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Post extends Model implements Searchable
+class Post extends Model
 {
-    use HasFactory, SearchableTrait;
+    use HasFactory, Searchable;
 
     const MAX_CHAR = 320;
 

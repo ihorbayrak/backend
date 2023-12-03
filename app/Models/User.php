@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Casts\GeoCoordinates;
 use App\Modules\V1\Search\Services\Elasticsearch\Searchable;
-use App\Modules\V1\Search\Services\Elasticsearch\SearchableTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -44,9 +43,9 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
  * @method static \Illuminate\Database\Eloquent\Builder|User withoutTrashed()
  * @mixin \Eloquent
  */
-class User extends Authenticatable implements JWTSubject, Searchable
+class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable, SoftDeletes, SearchableTrait;
+    use HasFactory, Notifiable, SoftDeletes, Searchable;
 
     protected $fillable = [
         'name',

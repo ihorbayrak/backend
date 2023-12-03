@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Modules\V1\Search\Services\Elasticsearch\Searchable;
-use App\Modules\V1\Search\Services\Elasticsearch\SearchableTrait;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -53,9 +52,9 @@ use Illuminate\Support\Facades\Storage;
  * @method static \Illuminate\Database\Eloquent\Builder|Profile withoutTrashed()
  * @mixin \Eloquent
  */
-class Profile extends Model implements Searchable
+class Profile extends Model
 {
-    use HasFactory, SoftDeletes, SearchableTrait;
+    use HasFactory, SoftDeletes, Searchable;
 
     const MAX_BIO_CHARS = 180;
     const AVATAR_WIDTH = 180;
