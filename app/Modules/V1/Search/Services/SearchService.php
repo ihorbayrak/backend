@@ -2,11 +2,12 @@
 
 namespace App\Modules\V1\Search\Services;
 
+use App\Models\Post;
+use App\Models\Profile;
 use App\Modules\V1\Post\Resources\PostResource;
 use App\Modules\V1\Search\DTO\SearchFilters;
 use App\Modules\V1\Search\DTO\SearchParams;
-use App\Modules\V1\Search\Repositories\Posts\PostSearchRepositoryInterface;
-use App\Modules\V1\Search\Repositories\Profiles\ProfileSearchRepositoryInterface;
+use App\Modules\V1\Search\Repositories\SearchRepositoryInterface;
 use App\Modules\V1\User\Resources\ProfileResource;
 
 class SearchService
@@ -15,10 +16,8 @@ class SearchService
     private const FILTER_LATEST = 'latest';
     private const FILTER_PROFILE = 'profile';
 
-    public function __construct(
-        private PostSearchRepositoryInterface $postSearchRepository,
-        private ProfileSearchRepositoryInterface $profileSearchRepository
-    ) {
+    public function __construct(private SearchRepositoryInterface $searchRepository)
+    {
     }
 
     public function search(SearchParams $dto)
@@ -43,14 +42,14 @@ class SearchService
 
     private function searchProfiles(string $query, SearchFilters $filters)
     {
-        $profiles = $this->profileSearchRepository->search($query, $filters);
+        $profiles = $this->searchRepository->for(Profile::class)->search($query, $filters);
 
         return ProfileResource::collection($profiles);
     }
 
     private function searchPosts(string $query, SearchFilters $filters)
     {
-        $posts = $this->postSearchRepository->search($query, $filters);
+        $posts = $this->searchRepository->for(Post::class)->search($query, $filters);
 
         return PostResource::collection($posts);
     }
